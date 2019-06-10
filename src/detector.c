@@ -129,6 +129,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 
     args.angle = net.angle;
     args.blur = net.blur;
+    args.mixup = net.mixup;
     args.exposure = net.exposure;
     args.saturation = net.saturation;
     args.hue = net.hue;
@@ -888,7 +889,11 @@ void validate_detector(char *datacfg, char *cfgfile, char *weightfile, char *out
         if (fps) fclose(fps[j]);
     }
     if (coco) {
+#ifdef WIN32
+        fseek(fp, -3, SEEK_CUR);
+#else
         fseek(fp, -2, SEEK_CUR);
+#endif
         fprintf(fp, "\n]\n");
         fclose(fp);
     }
@@ -1381,10 +1386,10 @@ float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, floa
     const float cur_precision = (float)tp_for_thresh / ((float)tp_for_thresh + (float)fp_for_thresh);
     const float cur_recall = (float)tp_for_thresh / ((float)tp_for_thresh + (float)(unique_truth_count - tp_for_thresh));
     const float f1_score = 2.F * cur_precision * cur_recall / (cur_precision + cur_recall);
-    printf("\n for thresh = %1.2f, precision = %1.2f, recall = %1.2f, F1-score = %1.2f \n",
+    printf("\n for conf_thresh = %1.2f, precision = %1.2f, recall = %1.2f, F1-score = %1.2f \n",
         thresh_calc_avg_iou, cur_precision, cur_recall, f1_score);
 
-    printf(" for thresh = %0.2f, TP = %d, FP = %d, FN = %d, average IoU = %2.2f %% \n",
+    printf(" for conf_thresh = %0.2f, TP = %d, FP = %d, FN = %d, average IoU = %2.2f %% \n",
         thresh_calc_avg_iou, tp_for_thresh, fp_for_thresh, unique_truth_count - tp_for_thresh, avg_iou * 100);
 
     mean_average_precision = mean_average_precision / classes;
