@@ -750,8 +750,8 @@ typedef struct box_label {
     float left, right, top, bottom;
 } box_label;
 
-typedef void (* train_detector_callback) (int curr_batch, float loss, float avg_loss, float curr_rate, double spend_time, int images);
-
+// typedef void (* train_detector_callback) (int curr_batch, float loss, float avg_loss, float curr_rate, double spend_time, int images);
+typedef void (* train_detector_callback) (char *error, int curr_batch, float loss, float avg_loss, float curr_rate, double spend_time, int images);
 // list.h
 //typedef struct node {
 //    void *val;

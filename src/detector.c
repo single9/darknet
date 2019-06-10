@@ -360,7 +360,7 @@ void train_detector_with_callback(char *datacfg, char *cfgfile, char *weightfile
         FILE* valid_file = fopen(valid_images, "r");
         if (!valid_file) {
             printf("\n Error: There is no %s file for mAP calculation!\n Don't use -map flag.\n Or set valid=%s in your %s file. \n", valid_images, train_images, datacfg);
-            getchar();
+            callback("E_INVALID_IMAGE", -1, -1, -1, -1, -1, -1);
             exit(-1);
         }
         else fclose(valid_file);
@@ -379,7 +379,10 @@ void train_detector_with_callback(char *datacfg, char *cfgfile, char *weightfile
         if (net_classes != names_size) {
             printf(" Error: in the file %s number of names %d that isn't equal to classes=%d in the file %s \n",
                 name_list, names_size, net_classes, cfgfile);
-            if (net_classes > names_size) getchar();
+            if (net_classes > names_size) {
+                callback("E_NOT_EQUAL_CLASSES", -1, -1, -1, -1, -1, -1);
+                return;
+            }
         }
     }
 
@@ -410,7 +413,8 @@ void train_detector_with_callback(char *datacfg, char *cfgfile, char *weightfile
     const int actual_batch_size = net.batch * net.subdivisions;
     if (actual_batch_size == 1) {
         printf("\n Error: You set incorrect value batch=1 for Training! You should set batch=64 subdivision=64 \n");
-        getchar();
+        callback("E_INCORRECT_BATCH", -1, -1, -1, -1, -1, -1);
+        return;
     }
     else if (actual_batch_size < 8) {
         printf("\n Warning: You set batch=%d lower than 64! It is recommended to set batch=64 subdivision=64 \n", actual_batch_size);
@@ -580,7 +584,7 @@ void train_detector_with_callback(char *datacfg, char *cfgfile, char *weightfile
         double spend_time = (what_time_is_it_now() - time);
 
         // printf("\n %d: %f, %f avg loss, %f rate, %lf seconds, %d images\n", curr_batch, loss, avg_loss, curr_rate, spend_time, i*imgs);
-        callback(curr_batch, loss, avg_loss, curr_rate, spend_time, i*imgs);
+        callback(NULL, curr_batch, loss, avg_loss, curr_rate, spend_time, i*imgs);
 
         int draw_precision = 0;
         if (calc_map && (i >= next_map_calc || i == net.max_batches)) {
