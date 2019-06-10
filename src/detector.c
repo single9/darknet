@@ -654,6 +654,7 @@ void train_detector_with_callback(char *datacfg, char *cfgfile, char *weightfile
     char buff[256];
     sprintf(buff, "%s/%s_final.weights", backup_directory, base);
     save_weights(net, buff);
+    callback(NULL, get_current_batch(net), 0, 0, 0, 0, 0);
 
 #ifdef OPENCV
     release_mat(&img);
