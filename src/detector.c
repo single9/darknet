@@ -655,7 +655,10 @@ void train_detector_with_callback(char *datacfg, char *cfgfile, char *weightfile
     char buff[256];
     sprintf(buff, "%s/%s_final.weights", backup_directory, base);
     save_weights(net, buff);
-    callback(NULL, get_current_batch(net), 0, 0, 0, 0, 0);
+    int curr_batch = get_current_batch(net);
+    float curr_rate = get_current_rate(net);
+    double spend_time = (what_time_is_it_now() - time);
+    callback(NULL, curr_batch, 0, avg_loss, curr_rate, spend_time, i*imgs);
 
 #ifdef OPENCV
     release_mat(&img);
